@@ -1,0 +1,19 @@
+.tube {
+  transition: opacity 1s ease-in;
+  font-size: 2rem;
+}
+
+.tube-appear {
+  opacity: 0;
+}
+
+.tube-appear.tube-appear-active {
+  opacity: 1;
+}
+
+.tube-enter {
+  opacity: .5;
+}
+.tube-enter.tube-enter-active {
+  opacity: .2;
+}
