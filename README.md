@@ -9,5 +9,5 @@ Clone this repo, cd into the cloned directory, run `yarn` and `yarn run dev`. Br
 ```bash
 $ git clone https://github.com/btnwtn/RoboAlgebra.git
 $ cd RoboAlgebra
-$ yarn && yarn run dev
+$ yarn && yarn run start
 ```
