@@ -51,7 +51,7 @@ const Emoji = DragSource(Types.KISSY, emojiSource, collect)(
           zIndex: 2,
           cursor: 'move'
         }}>
-        😘
+        ☺️
         </span>
       )
     }
@@ -64,7 +64,7 @@ const squareTarget = {
       type: 'DISPLAY_OUTPUT',
       payload: {
         emoji: 'kissy',
-        output: ['😘😘😘🐢']
+        output: ['☺️☺️☺️🐢']
       }
     })
     console.log(monitor.getItem())
