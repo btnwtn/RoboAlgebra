@@ -3,8 +3,6 @@ import { createStore } from 'redux'
 import { connect, Provider } from 'react-redux'
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
-import 'normalize.css'
 import './App.css';
 
 const initialState = {
@@ -15,20 +13,23 @@ let store = createStore(function (state = initialState, action) {
   switch (action.type) {
     case 'DISPLAY_OUTPUT':
       return {
-        output: [...state.output, ...action.payload.output]
+        output: [
+          ...state.output,
+          ...action.payload.output
+        ]
       }
     default: return state
   }
 }, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 const Types = {
-  KISSY: Symbol('kissy')
+  EMOJI: 'EMOJI',
 }
 
 const emojiSource = {
   beginDrag(props) {
     return {
-      emojiId: 'kissy',
+      children: props.children
     }
   }
 }
@@ -40,18 +41,20 @@ function collect(connect, monitor) {
   }
 }
 
-const Emoji = DragSource(Types.KISSY, emojiSource, collect)(
+const Emoji = DragSource(Types.EMOJI, emojiSource, collect)(
   class Emoji extends Component {
     render() {
       const { connectDragSource, isDragging } = this.props
       return connectDragSource(
         <span style={{
           opacity: isDragging ? 0.5 : 1,
+          border: '2px solid silver',
           fontSize: '2rem',
+          marginRight: '1rem',
           zIndex: 2,
           cursor: 'move'
         }}>
-        ☺️
+          {this.props.children}
         </span>
       )
     }
@@ -63,11 +66,9 @@ const squareTarget = {
     store.dispatch({
       type: 'DISPLAY_OUTPUT',
       payload: {
-        emoji: 'kissy',
-        output: ['☺️☺️☺️🐢']
+        output: [`${monitor.getItem().children.repeat(3)}🐢`] 
       }
     })
-    console.log(monitor.getItem())
   }
 }
 
@@ -84,7 +85,7 @@ const Question = `function (emoji) {
 
 }`
 
-const Square = DropTarget(Types.KISSY, squareTarget, squareCollect)(
+const Square = DropTarget(Types.EMOJI, squareTarget, squareCollect)(
   class Square extends Component {
     render() {
       const { connectDropTarget, isOver } = this.props
@@ -110,17 +111,19 @@ function mapStateToProps({ output }) {
 const Output = connect(mapStateToProps)(
   (props) => {
     return (
-      <ReactCSSTransitionGroup
-        transitionName="tube"
-        transitionAppear={true}
-        transitionAppearTimeout={500}
-        transitionEnterTimeout={500}
-        transitionLeaveTimeout={500}
-      >
-        {props.output.map((emoji, i) => (
-          <div key={`emoji-${i}`}>{emoji}</div>
-        ))}
-      </ReactCSSTransitionGroup>
+      <div>
+        <h2>Results:</h2>
+      {props.output.map((emoji, i) => (
+        <div
+          key={`emoji-${i}`}
+          style={{
+            fontSize: '2rem',
+          }}
+        >
+          {emoji}
+        </div>
+      ))}
+      </div>
     )
   }
 )
@@ -131,7 +134,16 @@ class App extends Component {
       <Provider store={store}>
         <div>
           <h1>RoboAlgebra</h1>
-          <Emoji/>
+          <Emoji>
+            ☺️
+          </Emoji>
+          <Emoji>
+            👽
+          </Emoji>
+          <Emoji>
+            👽👽
+          </Emoji>
+          <h2>Drag an Emoji into the code below:</h2>
           <Square/>
           <Output/>
         </div>
