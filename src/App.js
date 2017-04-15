@@ -19,6 +19,10 @@ let store = createStore(
         return {
           output: [...state.output, ...action.payload.output]
         };
+      case "CLEAR_OUTPUT":
+        return {
+          output: []
+        };
       default:
         return state;
     }
@@ -105,6 +109,9 @@ class App extends Component {
               }}
               onClick={event => {
                 event.preventDefault();
+                if (this.state.question === 2) {
+                  store.dispatch({ type: "CLEAR_OUTPUT" });
+                }
                 this.setState({ question: 1 });
               }}
             >
@@ -119,6 +126,9 @@ class App extends Component {
               }}
               onClick={event => {
                 event.preventDefault();
+                if (this.state.question === 1) {
+                  store.dispatch({ type: "CLEAR_OUTPUT" });
+                }
                 this.setState({ question: 2 });
               }}
             >
@@ -131,7 +141,7 @@ class App extends Component {
             <FunctionBlock
               handleDrop={monitor => {
                 const emoji = monitor.getItem().children;
-                return `${emoji.repeat(2)}😎`;
+                return `IN: ${emoji} OUT: ${emoji.repeat(2)}😎`;
               }}
             >
               {Question2}
@@ -141,7 +151,7 @@ class App extends Component {
             <FunctionBlock
               handleDrop={monitor => {
                 const emoji = monitor.getItem().children;
-                return `${emoji.repeat(3)}🐢`;
+                return `IN: ${emoji} OUT: ${emoji.repeat(3)}🐢`;
               }}
             >
               {Question1}
