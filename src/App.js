@@ -1,9 +1,12 @@
 import React, { Component } from "react";
 import { createStore } from "redux";
 import { connect, Provider } from "react-redux";
-import { DragDropContext, DragSource, DropTarget } from "react-dnd";
+import { DragDropContext } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
 import "./App.css";
+
+import Emoji from "./containers/Emoji";
+import FunctionBlock from "./containers/FunctionBlock";
 
 const initialState = {
   output: []
@@ -23,91 +26,17 @@ let store = createStore(
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
 
-const Types = {
-  EMOJI: "EMOJI"
-};
-
-const emojiSource = {
-  beginDrag(props) {
-    return {
-      children: props.children
-    };
-  }
-};
-
-function collect(connect, monitor) {
-  return {
-    connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging()
-  };
-}
-
-const Emoji = DragSource(Types.EMOJI, emojiSource, collect)(
-  class Emoji extends Component {
-    render() {
-      const { connectDragSource, isDragging } = this.props;
-      return connectDragSource(
-        <span
-          style={{
-            opacity: isDragging ? 0.5 : 1,
-            border: "2px solid silver",
-            fontSize: "2rem",
-            marginRight: "1rem",
-            zIndex: 2,
-            cursor: "move"
-          }}
-        >
-          {this.props.children}
-        </span>
-      );
-    }
-  }
-);
-
-const squareTarget = {
-  drop(props, monitor) {
-    store.dispatch({
-      type: "DISPLAY_OUTPUT",
-      payload: {
-        output: [`${monitor.getItem().children.repeat(3)}🐢`]
-      }
-    });
-  }
-};
-
-function squareCollect(connect, monitor) {
-  return {
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver()
-  };
-}
-
-const Question = `function (emoji) {
+const Question1 = `function (emoji) {
 
   return emoji * 3 + 🐢
 
 }`;
 
-const Square = DropTarget(Types.EMOJI, squareTarget, squareCollect)(
-  class Square extends Component {
-    render() {
-      const { connectDropTarget, isOver } = this.props;
-      return connectDropTarget(
-        <pre
-          style={{
-            maxWidth: "26.25rem",
-            padding: "1rem",
-            fontSize: "1.5rem",
-            backgroundColor: isOver ? "yellow" : "#eee",
-            border: "2px solid #dedede"
-          }}
-        >
-          {Question}
-        </pre>
-      );
-    }
-  }
-);
+const Question2 = `function (emoji) {
+
+  return emoji * 2 + 😎
+
+}`;
 
 function mapStateToProps({ output }) {
   return {
@@ -118,7 +47,7 @@ function mapStateToProps({ output }) {
 const Output = connect(mapStateToProps)(props => {
   return (
     <div>
-      <h2>Results:</h2>
+      {Boolean(props.output.length) && <h2>Results:</h2>}
       {props.output.map((emoji, i) => (
         <div
           key={`emoji-${i}`}
@@ -134,6 +63,10 @@ const Output = connect(mapStateToProps)(props => {
 });
 
 class App extends Component {
+  state = {
+    question: 1
+  };
+
   render() {
     return (
       <Provider store={store}>
@@ -154,8 +87,66 @@ class App extends Component {
           <Emoji>
             👽👽
           </Emoji>
+
+          <h2 style={{ marginTop: "2rem" }}>Pick a Question</h2>
+          <div
+            style={{
+              fontSize: "1.25rem",
+              marginTop: "1rem"
+            }}
+          >
+            <a
+              href="#"
+              style={{
+                marginRight: "1rem",
+                cursor: this.state.question === 1 ? "default" : "pointer",
+                color: this.state.question === 1 ? "black" : "",
+                textDecoration: this.state.question === 1 ? "none" : "underline"
+              }}
+              onClick={event => {
+                event.preventDefault();
+                this.setState({ question: 1 });
+              }}
+            >
+              Question 1
+            </a>
+            <a
+              href="#"
+              style={{
+                cursor: this.state.question === 2 ? "default" : "pointer",
+                color: this.state.question === 2 ? "black" : "",
+                textDecoration: this.state.question === 2 ? "none" : "underline"
+              }}
+              onClick={event => {
+                event.preventDefault();
+                this.setState({ question: 2 });
+              }}
+            >
+              Question 2
+            </a>
+          </div>
+
           <h2>Drag an Emoji into the code below:</h2>
-          <Square />
+          {this.state.question === 1 &&
+            <FunctionBlock
+              handleDrop={monitor => {
+                const emoji = monitor.getItem().children;
+                return `${emoji.repeat(2)}😎`;
+              }}
+            >
+              {Question2}
+            </FunctionBlock>}
+
+          {this.state.question === 2 &&
+            <FunctionBlock
+              handleDrop={monitor => {
+                const emoji = monitor.getItem().children;
+                return `${emoji.repeat(3)}🐢`;
+              }}
+            >
+              {Question1}
+            </FunctionBlock>}
+
           <Output />
         </div>
       </Provider>
