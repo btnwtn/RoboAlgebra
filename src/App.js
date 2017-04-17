@@ -7,7 +7,6 @@ import "./App.css";
 
 import Emoji from "./containers/Emoji";
 import FunctionBlock from "./containers/FunctionBlock";
-import TubeTarget from './components/Tube'
 
 const initialState = {
   output: []
@@ -138,10 +137,6 @@ class App extends Component {
           </div>
 
           <h2>Drag an Emoji into the code below:</h2>
-
-          <TubeTarget>
-            2x + 3
-          </TubeTarget>
 
           {this.state.question === 1 &&
             <FunctionBlock
